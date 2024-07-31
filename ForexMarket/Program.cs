@@ -1,6 +1,9 @@
 using ForexMarket.Data;
+using ForexMarket.Middleware;
 using ForexMarket.Services;
+using ForexMarket.Services.LifeTimeServices;
 using ForexMarket.Utility.AppSettingsClasses;
+using ForexMarket.Utility.DI_AppSettings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,16 +24,16 @@ namespace ForexMarket {
 
             builder.Services.AddTransient<IMarketForcaster, MarketForcaster>();
 
+           
+
+            builder.Services.AddServicesToConfig(builder.Configuration);
+
+            builder.Services.AddTransient<TransientService>();
+            builder.Services.AddScoped<ScopedService>();
+            builder.Services.AddSingleton<SingletonService>();
+
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
             builder.Services.AddRazorPages();
-
-            builder.Services.Configure<WazeForcastSettings>(builder.Configuration.GetSection("WazeForecast"));
-            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
-            builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
-            builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
-
-
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -48,7 +51,7 @@ namespace ForexMarket {
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseMiddleware<CustomeMiddleware>();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
