@@ -6,11 +6,15 @@ using System.Diagnostics;
 
 namespace ForexMarket.Controllers {
     public class HomeController : Controller {
-        
+        public HomeVM homeVM { get; set; }
+        public readonly IMarketForcaster marketForcaster;
+
+        public HomeController(IMarketForcaster marketForcaster) {
+            this.homeVM = new HomeVM();
+            this.marketForcaster = marketForcaster;
+        }
 
         public IActionResult Index() {
-            HomeVM homeVM = new HomeVM();
-            MarketForcaster marketForcaster = new MarketForcaster();
             MarketResult marketResult = marketForcaster.GetMarketPrediction();
 
             switch (marketResult.MarketCondition) {

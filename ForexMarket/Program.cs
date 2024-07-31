@@ -1,4 +1,5 @@
 using ForexMarket.Data;
+using ForexMarket.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,10 @@ namespace ForexMarket {
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            builder.Services.AddTransient<IMarketForcaster, MarketForcaster>();
+
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
             builder.Services.AddRazorPages();
 
