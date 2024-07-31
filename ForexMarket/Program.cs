@@ -1,5 +1,6 @@
 using ForexMarket.Data;
 using ForexMarket.Services;
+using ForexMarket.Utility.AppSettingsClasses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,13 @@ namespace ForexMarket {
 
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
             builder.Services.AddRazorPages();
+
+            builder.Services.Configure<WazeForcastSettings>(builder.Configuration.GetSection("WazeForecast"));
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
+            builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
+
+
 
             var app = builder.Build();
 
