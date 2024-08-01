@@ -1,4 +1,7 @@
 ﻿@model ForexMarket.Models.ViewModels.HomeVM
+@using Microsoft.Extensions.Options
+@inject IOptions<ForexMarket.Utility.AppSettingsClasses.WazeForcastSettings> wazeForcastSett
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -6,4 +9,5 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>@Model.MarketForecast</p>
+    <p>Current Market Prediction Status: @(wazeForcastSett.Value.ForecastTrackerEnabled?"Online":"Offline")</p>
 </div>

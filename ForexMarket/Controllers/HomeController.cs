@@ -15,13 +15,10 @@ namespace ForexMarket.Controllers {
         public readonly TwilioSettings twilioSettings;
         public readonly SendGridSettings sendGridSettings;
 
-        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings, IOptions<StripeSettings> stripeSettings, IOptions<TwilioSettings> twilioSettings, IOptions<SendGridSettings> sendGridSettings) {
+        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings) {
             this.homeVM = new HomeVM();
             this.marketForcaster = marketForcaster;
             this.wazeForcastSettings = wazeForcastSettings.Value;
-            this.stripeSettings = stripeSettings.Value;
-            this.twilioSettings = twilioSettings.Value;
-            this.sendGridSettings = sendGridSettings.Value;
         }
 
         public IActionResult Index() {
@@ -46,15 +43,15 @@ namespace ForexMarket.Controllers {
             return View(homeVM);
         }
 
-        public IActionResult AllConfigSettings() {
+        public IActionResult AllConfigSettings([FromServices] IOptions<StripeSettings> stripeSettings, [FromServices] IOptions<TwilioSettings> twilioSettings, [FromServices] IOptions<SendGridSettings> sendGridSettings) {
             List<string> settings = new List<string>();
             settings.Add($"ForecastTrackerEnabled: {wazeForcastSettings.ForecastTrackerEnabled}");
-            settings.Add($"Secret Key: {stripeSettings.SecretKey}");
-            settings.Add($"Publishable Key: {stripeSettings.PublishableKey}");
-            settings.Add($"Phone Number: {twilioSettings.PhoneNumber}");
-            settings.Add($"Auth token: {twilioSettings.AuthToken}");
-            settings.Add($"Account Sid: {twilioSettings.AccountSid}");
-            settings.Add($"Send grid key: {sendGridSettings.SendGridKey}");
+            settings.Add($"Secret Key: {stripeSettings.Value.SecretKey}");
+            settings.Add($"Publishable Key: {stripeSettings.Value.PublishableKey}");
+            settings.Add($"Phone Number: {twilioSettings.Value.PhoneNumber}");
+            settings.Add($"Auth token: {twilioSettings.Value.AuthToken}");
+            settings.Add($"Account Sid: {twilioSettings.Value.AccountSid}");
+            settings.Add($"Send grid key: {sendGridSettings.Value.SendGridKey}");
             return View(settings);
         }
 
