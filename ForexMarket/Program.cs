@@ -1,5 +1,6 @@
 using ForexMarket.Data;
 using ForexMarket.Middleware;
+using ForexMarket.Models;
 using ForexMarket.Services;
 using ForexMarket.Services.LifeTimeServices;
 using ForexMarket.Utility.AppSettingsClasses;
@@ -32,7 +33,19 @@ namespace ForexMarket {
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, AddressValidationChecker>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, CreditValidationChecker>());
             builder.Services.AddScoped<ICreditValidator, CreditValidator>();
-           
+
+            builder.Services.AddScoped<CreditApprovedLow>();
+            builder.Services.AddScoped<CreditApprovedHigh>();
+
+            builder.Services.AddScoped<Func<CreditApprovedEnum, ICreditApproved>>(ServiceProvider => range => {
+                switch (range) {
+                    case CreditApprovedEnum.High: return ServiceProvider.GetService<CreditApprovedHigh>();
+                    case CreditApprovedEnum.Low: return ServiceProvider.GetService<CreditApprovedLow>();
+                    default: return ServiceProvider.GetService<CreditApprovedLow>();
+                }
+            });
+
+
 
             builder.Services.AddServicesToConfig(builder.Configuration);
 

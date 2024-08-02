@@ -1,7 +1,7 @@
 ﻿@model ForexMarket.Models.ViewModels.CreditResult
 
 @if (Model.Success) {
-    <h1>Congratulations! Your application has been approved!</h1>
+    <h1>Congratulations! Your application has been approved!$@Model.CreditApproved</h1>
     <h3>Your application ID : @Model.CreditID</h3>
 } else {
     <h1>Your application could not be approved at this point!</h1>

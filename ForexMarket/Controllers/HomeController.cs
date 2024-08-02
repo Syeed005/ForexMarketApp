@@ -71,7 +71,7 @@ namespace ForexMarket.Controllers {
         [ValidateAntiForgeryToken]
         [HttpPost]
         [ActionName("CreditApplication")]
-        public async Task<IActionResult> CreditApplicationPost() {
+        public async Task<IActionResult> CreditApplicationPost([FromServices] Func<CreditApprovedEnum, ICreditApproved> creditService) {
             if (ModelState.IsValid) {
                 var (validationPass, errorMessages) = await creditValidator.PassAllValidations(CreditModel);
                 CreditResult creditResult = new CreditResult() {
@@ -81,10 +81,13 @@ namespace ForexMarket.Controllers {
                 };
                 if (validationPass) {
                     //add record to db
+                    CreditModel.CreditApproved = creditService(CreditModel.Salary > 5000 ? CreditApprovedEnum.High : CreditApprovedEnum.Low).GetCreditApproved(CreditModel);
+
+
                     db.CreateApplicationModel.Add(CreditModel);
                     db.SaveChanges();
                     creditResult.CreditID = CreditModel.Id;
-
+                    creditResult.CreditApproved = CreditModel.CreditApproved;
                     return RedirectToAction(nameof(CreditResult), creditResult);
                 } else {
                     return RedirectToAction(nameof(CreditResult), creditResult);
