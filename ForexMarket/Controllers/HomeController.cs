@@ -1,3 +1,4 @@
+using ForexMarket.Data;
 using ForexMarket.Models;
 using ForexMarket.Models.ViewModels;
 using ForexMarket.Services;
@@ -15,10 +16,17 @@ namespace ForexMarket.Controllers {
         public readonly TwilioSettings twilioSettings;
         public readonly SendGridSettings sendGridSettings;
 
-        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings) {
+        private readonly ICreditValidator creditValidator;
+        private readonly ApplicationDbContext db;
+
+        [BindProperty]
+        public CreditApplication CreditModel { get; set; }
+        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings, ICreditValidator creditValidator, ApplicationDbContext db) {
             this.homeVM = new HomeVM();
             this.marketForcaster = marketForcaster;
             this.wazeForcastSettings = wazeForcastSettings.Value;
+            this.creditValidator = creditValidator;
+            this.db = db;
         }
 
         public IActionResult Index() {
@@ -53,6 +61,41 @@ namespace ForexMarket.Controllers {
             settings.Add($"Account Sid: {twilioSettings.Value.AccountSid}");
             settings.Add($"Send grid key: {sendGridSettings.Value.SendGridKey}");
             return View(settings);
+        }
+
+        public IActionResult CreditApplication() {
+            CreditModel = new CreditApplication();
+            return View(CreditModel);
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        [ActionName("CreditApplication")]
+        public async Task<IActionResult> CreditApplicationPost() {
+            if (ModelState.IsValid) {
+                var (validationPass, errorMessages) = await creditValidator.PassAllValidations(CreditModel);
+                CreditResult creditResult = new CreditResult() {
+                    ErrorList = errorMessages,
+                    CreditID = 0,
+                    Success = validationPass
+                };
+                if (validationPass) {
+                    //add record to db
+                    db.CreateApplicationModel.Add(CreditModel);
+                    db.SaveChanges();
+                    creditResult.CreditID = CreditModel.Id;
+
+                    return RedirectToAction(nameof(CreditResult), creditResult);
+                } else {
+                    return RedirectToAction(nameof(CreditResult), creditResult);
+                }
+            }
+
+            return View(CreditModel);
+        }
+
+        public IActionResult CreditResult(CreditResult creditResult) {
+            return View(creditResult);
         }
 
         public IActionResult Privacy() {

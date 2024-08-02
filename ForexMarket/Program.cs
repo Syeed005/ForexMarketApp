@@ -6,6 +6,7 @@ using ForexMarket.Utility.AppSettingsClasses;
 using ForexMarket.Utility.DI_AppSettings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ForexMarket {
     public class Program {
@@ -23,7 +24,14 @@ namespace ForexMarket {
 
 
             builder.Services.AddTransient<IMarketForcaster, MarketForcaster>();
+            
 
+            //it will add multiple validation
+            //builder.Services.AddScoped<IValidationChecker, AddressValidationChecker>();
+            //builder.Services.AddScoped<IValidationChecker, CreditValidationChecker>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, AddressValidationChecker>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, CreditValidationChecker>());
+            builder.Services.AddScoped<ICreditValidator, CreditValidator>();
            
 
             builder.Services.AddServicesToConfig(builder.Configuration);
