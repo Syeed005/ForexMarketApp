@@ -1,6 +1,8 @@
 using ForexMarket.Data;
 using ForexMarket.Middleware;
 using ForexMarket.Models;
+using ForexMarket.Repository;
+using ForexMarket.Repository.IRepository;
 using ForexMarket.Services;
 using ForexMarket.Services.LifeTimeServices;
 using ForexMarket.Utility.AppSettingsClasses;
@@ -32,7 +34,9 @@ namespace ForexMarket {
             //builder.Services.AddScoped<IValidationChecker, CreditValidationChecker>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, AddressValidationChecker>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IValidationChecker, CreditValidationChecker>());
+
             builder.Services.AddScoped<ICreditValidator, CreditValidator>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddScoped<CreditApprovedLow>();
             builder.Services.AddScoped<CreditApprovedHigh>();
@@ -52,9 +56,15 @@ namespace ForexMarket {
             builder.Services.AddTransient<TransientService>();
             builder.Services.AddScoped<ScopedService>();
             builder.Services.AddSingleton<SingletonService>();
+            
+
+
 
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
             builder.Services.AddRazorPages();
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

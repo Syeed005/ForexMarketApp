@@ -1,6 +1,8 @@
 using ForexMarket.Data;
 using ForexMarket.Models;
 using ForexMarket.Models.ViewModels;
+using ForexMarket.Repository;
+using ForexMarket.Repository.IRepository;
 using ForexMarket.Services;
 using ForexMarket.Utility.AppSettingsClasses;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +19,16 @@ namespace ForexMarket.Controllers {
         public readonly SendGridSettings sendGridSettings;
 
         private readonly ICreditValidator creditValidator;
-        private readonly ApplicationDbContext db;
+        private readonly IUnitOfWork unitOfWork;
 
         [BindProperty]
         public CreditApplication CreditModel { get; set; }
-        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings, ICreditValidator creditValidator, ApplicationDbContext db) {
+        public HomeController(IMarketForcaster marketForcaster, IOptions<WazeForcastSettings> wazeForcastSettings, ICreditValidator creditValidator, IUnitOfWork unitOfWork) {
             this.homeVM = new HomeVM();
             this.marketForcaster = marketForcaster;
             this.wazeForcastSettings = wazeForcastSettings.Value;
             this.creditValidator = creditValidator;
-            this.db = db;
+            this.unitOfWork = unitOfWork;
         }
 
         public IActionResult Index() {
@@ -84,8 +86,11 @@ namespace ForexMarket.Controllers {
                     CreditModel.CreditApproved = creditService(CreditModel.Salary > 5000 ? CreditApprovedEnum.High : CreditApprovedEnum.Low).GetCreditApproved(CreditModel);
 
 
-                    db.CreateApplicationModel.Add(CreditModel);
-                    db.SaveChanges();
+                    //db.CreateApplicationModel.Add(CreditModel);
+                    //db.SaveChanges();
+                    unitOfWork.CreditApplication.Add(CreditModel);
+                    unitOfWork.Save();
+
                     creditResult.CreditID = CreditModel.Id;
                     creditResult.CreditApproved = CreditModel.CreditApproved;
                     return RedirectToAction(nameof(CreditResult), creditResult);
