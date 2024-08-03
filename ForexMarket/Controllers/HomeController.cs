@@ -53,6 +53,7 @@ namespace ForexMarket.Controllers {
             return View(homeVM);
         }
 
+        
         public IActionResult AllConfigSettings([FromServices] IOptions<StripeSettings> stripeSettings, [FromServices] IOptions<TwilioSettings> twilioSettings, [FromServices] IOptions<SendGridSettings> sendGridSettings) {
             List<string> settings = new List<string>();
             settings.Add($"ForecastTrackerEnabled: {wazeForcastSettings.ForecastTrackerEnabled}");
@@ -64,7 +65,7 @@ namespace ForexMarket.Controllers {
             settings.Add($"Send grid key: {sendGridSettings.Value.SendGridKey}");
             return View(settings);
         }
-
+        [ServiceFilter(typeof(ProtectorAttribute))]
         public IActionResult CreditApplication() {
             CreditModel = new CreditApplication();
             return View(CreditModel);
@@ -73,6 +74,7 @@ namespace ForexMarket.Controllers {
         [ValidateAntiForgeryToken]
         [HttpPost]
         [ActionName("CreditApplication")]
+        [ServiceFilter(typeof(ProtectorAttribute))]
         public async Task<IActionResult> CreditApplicationPost([FromServices] Func<CreditApprovedEnum, ICreditApproved> creditService) {
             if (ModelState.IsValid) {
                 var (validationPass, errorMessages) = await creditValidator.PassAllValidations(CreditModel);
