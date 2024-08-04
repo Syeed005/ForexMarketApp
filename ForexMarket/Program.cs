@@ -39,13 +39,15 @@ namespace ForexMarket
             builder.Services.AddScoped<ICreditValidator, CreditValidator>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            builder.Services.AddScoped<CreditApprovedLow>();
-            builder.Services.AddScoped<CreditApprovedHigh>();
-
+            
+            //Authorizer & personal protector implementation
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IAuthorizer, IpBasedAuthorizer>();
             builder.Services.AddScoped<ProtectorAttribute>();
 
+
+            builder.Services.AddScoped<CreditApprovedLow>();
+            builder.Services.AddScoped<CreditApprovedHigh>();
             builder.Services.AddScoped<Func<CreditApprovedEnum, ICreditApproved>>(ServiceProvider => range => {
                 switch (range) {
                     case CreditApprovedEnum.High: return ServiceProvider.GetService<CreditApprovedHigh>();
