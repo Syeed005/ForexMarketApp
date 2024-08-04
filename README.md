@@ -10,6 +10,10 @@ A demo currency market app built on .net core 8 web app, Entity framework explor
 - Injecting services in Controller/Actions
 - Different ways to register services
 - Registering interface multiple times
-- Adding, removing and replacing service registration
+- Adding, removing, and replacing service registration
 - Register multiple implementations
 - Framework services like ILogger
+- Inject Action Filters in ASP .NET Core
+- Resolve Dependencies Based on Given Conditions
+- Inject Services Directly Into The Views in ASP .NET Core
+- Plug Third-Party IoC Containers (e.g. AutoFac) into Dependency Injection Framework of ASP .NET Core
